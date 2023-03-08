@@ -96,10 +96,12 @@ struct Genes read_genes(FILE* inputFile) {
 */
 void process_tetranucs(struct Genes genes, int* gene_TF, int gene_index) {
     // Process the current gene array
-    int size = genes.gene_sizes[gene_index];
-    int idx = 0;
-    int window[4];
+    int size = genes.gene_sizes[gene_index];        // Get size of gene
+    int idx = 0;                                    // Initialize index
+    int window[4];                                  // Initialize Window
+    
     for (int i = 0; i <= size-4; ++i) {
+        // Obtain substring tetranucleotide (A=0, C=1, G=2, T=3)
         for (int j = 0; j < 4; ++j) {
             if (genes.gene_sequences[gene_index * GENE_SIZE + i + j] == 'A') {
                 window[j] = 0;
@@ -114,6 +116,7 @@ void process_tetranucs(struct Genes genes, int* gene_TF, int gene_index) {
                 window[j] = 3;
             }
         }
+        // Convert tetranucleotide to its array index
         idx = window[0]*64 + window[1]*16 + window[2]*4 + window[3];
         ++gene_TF[idx];
     }
@@ -179,7 +182,8 @@ int main(int argc, char* argv[]) {
                 Add this gene's TF to the running total TF
     */ 
 
-    // TODO: parallelize the computations for each gene.
+    // Parallelize the computations for each gene with thread_count number of
+    // threads and shared variables genes and TF.
     #pragma omp parallel for num_threads(thread_count) default(none) shared(genes, TF)
     for (int gene_index = 0; gene_index < genes.num_genes; ++gene_index) {
 
@@ -198,6 +202,9 @@ int main(int argc, char* argv[]) {
 
     // 2) Get the averages of each TF (as a double!) 
     double* average_TF = (double*)malloc(NUM_TETRANUCS * sizeof(double));
+    // Parallelize the computations for each gene with thread_count number of
+    // threads and shared variables genes, TF, and average_TF.
+    #pragma omp parallel for num_threads(thread_count) default(none) shared(genes, TF, average_TF)
     for (int t = 0; t < NUM_TETRANUCS; ++t)
         average_TF[t] = (double)TF[t] / (double)genes.num_genes;
 
@@ -223,7 +230,7 @@ int main(int argc, char* argv[]) {
     fclose(timeFile);
     fclose(inputFile);
     fclose(outputFile);
-
+    free(average_TF);
     free(TF);
     free(genes.gene_sequences);
     free(genes.gene_sizes);

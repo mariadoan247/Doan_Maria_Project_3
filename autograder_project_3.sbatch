@@ -32,6 +32,14 @@ python3 -u autograder_project_3.py
 # To run just problem 2's autograder
 # python3 -u autograder_problem_3_2.py
 
+# To run only Experiment 2 for Problem 2
+# cd Problem_2
+# make clean
+# make Exp2
+# ./compute_average_TF_Exp2_schedule /home/oucspdn086/test_data/DNA_Files/GRCh38_50_rna.fna /home/oucspdn086/Doan_Maria_Project_3/Problem_2/res_schedule_50_8th.csv /home/oucspdn086/Doan_Maria_Project_3/Problem_2/tim_schedule_50_8th.csv 8
+# ./compute_average_TF_Exp2_schedule /home/oucspdn086/test_data/DNA_Files/GRCh38_reduced_rna.fna /home/oucspdn086/Doan_Maria_Project_3/Problem_2/res_schedule_reduced_8th.csv /home/oucspdn086/Doan_Maria_Project_3/Problem_2/tim_schedule_reduced_8th.csv 8
+# ./compute_average_TF_Exp2_schedule /home/oucspdn086/test_data/DNA_Files/GRCh38_latest_rna.fna /home/oucspdn086/Doan_Maria_Project_3/Problem_2/res_schedule_latest_8th.csv /home/oucspdn086/Doan_Maria_Project_3/Problem_2/tim_schedule_latest_8th.csv 8
+
 # To run just problem 3's autograder
 # python3 -u autograder_problem_3_3.py
 
