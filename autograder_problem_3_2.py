@@ -21,7 +21,7 @@ class Autograder_3_2(Base_Autograder):
         super().__init__()
 
         # Student information
-        self.student_name = "student"
+        self.student_name = "Maria Doan"
         self.is_grad = True
 
         # Directory information

@@ -13,12 +13,12 @@
 #
 # --------------------- Change the items below here! ---------------------
 #
-#SBATCH --mail-user=youremail@ou.edu
+#SBATCH --mail-user=mariadoan247@ou.edu
 #SBATCH --mail-type=ALL
 #
-#SBATCH --chdir=/home/user007/HW2/
-#SBATCH --output=/home/user007/HW2/autograding_%J_stdout.txt
-#SBATCH --error=/home/user007/HW2/autograding_%J_stderr.txt
+#SBATCH --chdir=/home/oucspdn086/Doan_Maria_Project_3/
+#SBATCH --output=/home/oucspdn086/Doan_Maria_Project_3/autograding_%J_stdout.txt
+#SBATCH --error=/home/oucspdn086/Doan_Maria_Project_3/autograding_%J_stderr.txt
 
 #################################################
 
