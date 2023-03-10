@@ -95,25 +95,63 @@ struct Genes read_genes(FILE* inputFile) {
             TF[idx]++
 */
 void process_tetranucs(struct Genes genes, int* gene_TF, int gene_index) {
-
-    // TODO: process the current gene array (Copy from problem 2)
+    // Process the current gene array
+    int size = genes.gene_sizes[gene_index];        // Get size of gene
+    int idx = 0;                                    // Initialize index
+    int window[4];                                  // Initialize Window
+    
+    for (int i = 0; i <= size-4; ++i) {
+        // Obtain substring tetranucleotide (A=0, C=1, G=2, T=3)
+        for (int j = 0; j < 4; ++j) {
+            if (genes.gene_sequences[gene_index * GENE_SIZE + i + j] == 'A') {
+                window[j] = 0;
+            }
+            else if (genes.gene_sequences[gene_index * GENE_SIZE + i + j] == 'C') {
+                window[j] = 1;
+            }
+            else if (genes.gene_sequences[gene_index * GENE_SIZE + i + j] == 'G') {
+                window[j] = 2;
+            }
+            else if (genes.gene_sequences[gene_index * GENE_SIZE + i + j] == 'T') {
+                window[j] = 3;
+            }
+        }
+        // Convert tetranucleotide to its array index
+        idx = window[0]*64 + window[1]*16 + window[2]*4 + window[3];
+        ++gene_TF[idx];
+    }
 
 } // End Process Tetranucs //
+
+
+// Source: https://www.tutorialspoint.com/c_standard_library/c_function_qsort.htm 
+// Compare function for using the qsort function (which implements quick sort)
+int compare(const void * a, const void * b) {
+   return ( *(int*)a - *(int*)b );
+}
 
 
 // Find Median ------------------------ //
 /* Find the median of an unsorted array */
 double find_median(int* freqs, int num_genes) {
 
-    // TODO: sort the frequencies
+    double res = 0.0;
 
-    // TODO: median if even
-    if (num_genes % 2 == 0)
-        return 2;
+    // Sort the frequencies
+    qsort(freqs, num_genes, sizeof(int), compare);
 
-    // TODO median if odd
+    // Median if even
+    if (num_genes % 2 == 0) {
+        int f1 = freqs[num_genes/2 - 1];
+        int f2 = freqs[num_genes/2];
+        res = (f1+f2)/2.0;
+    }
+
+    // Median if odd
     else
-        return 1;
+        res = (double) freqs[num_genes/2];
+        
+    return res;
 
 } // End Find Median //
 
@@ -123,8 +161,8 @@ double find_median(int* freqs, int num_genes) {
 //      Processes the tetranucleotides.
 int main(int argc, char* argv[]) {
     // Check for console errors
-    if (argc != 4) {
-        printf("USE LIKE THIS:\ncompute_average_TF_Exp1 input.fna average_TF.csv time.csv\n");
+    if (argc != 5) {
+        printf("USE LIKE THIS:\ncompute_median_TF_Exp1_baseline input.fna median_TF.csv time.csv num_threads\n");
         exit(-1);
     }
 
@@ -152,6 +190,9 @@ int main(int argc, char* argv[]) {
         exit(-4);
     }
 
+    // Get num threads
+    int thread_count = strtol(argv[4], NULL, 10);
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
 
     // Below is a data structure to help you access the gene-file's data:
@@ -161,16 +202,17 @@ int main(int argc, char* argv[]) {
     struct Genes genes = read_genes(inputFile);
 
     // Store each gene's TF array here
-    int** gene_TF_counts = (int*)malloc(genes.num_genes * sizeof(int*));
+    int** gene_TF_counts = (int**)malloc(genes.num_genes * sizeof(int*));
 
     // Get the start time
     double start = omp_get_wtime();
     /*  1) Tetranuc computation
             For each gene in the list:
-                Compute this gene’s TF
-                Add this gene’s TF to the running total TF
+                Compute this geneï¿½s TF
+                Add this geneï¿½s TF to the running total TF
 
     */ // TODO: parallelize the computations for each gene for exp 1 and exp 2.
+    #pragma omp parallel for num_threads(thread_count) default(none) shared(genes, gene_TF_counts)
     for (int gene_index = 0; gene_index < genes.num_genes; ++gene_index) {
 
         // Compute this gene's TF
@@ -189,10 +231,13 @@ int main(int argc, char* argv[]) {
         int num_genes = genes.num_genes;
         
         // save all frequencies of TF here
+        printf("\nUnsorted Frequencies: ");
         int* freqs = (int*)calloc(num_genes, sizeof(int));
-        for (int gene = 0; gene < num_genes; ++gene)
+        for (int gene = 0; gene < num_genes; ++gene){
             freqs[gene] = gene_TF_counts[gene][tet];
-
+            printf("%d ", freqs[gene]);
+        }
+        printf("  ");
         // find median frequency
         median_TF[tet] = find_median(freqs, num_genes);
         free(freqs);
