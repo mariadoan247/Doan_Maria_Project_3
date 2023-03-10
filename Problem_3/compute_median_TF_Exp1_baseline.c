@@ -231,13 +231,11 @@ int main(int argc, char* argv[]) {
         int num_genes = genes.num_genes;
         
         // save all frequencies of TF here
-        printf("\nUnsorted Frequencies: ");
         int* freqs = (int*)calloc(num_genes, sizeof(int));
         for (int gene = 0; gene < num_genes; ++gene){
             freqs[gene] = gene_TF_counts[gene][tet];
-            printf("%d ", freqs[gene]);
         }
-        printf("  ");
+        
         // find median frequency
         median_TF[tet] = find_median(freqs, num_genes);
         free(freqs);

@@ -203,6 +203,8 @@ int main(int argc, char* argv[]) {
 
     // Store each gene's TF array here
     int** gene_TF_counts = (int**)malloc(genes.num_genes * sizeof(int*));
+    // Store medians here
+    double* median_TF = (double*)calloc(NUM_TETRANUCS, sizeof(double));
 
     // Get the start time
     double start = omp_get_wtime();
@@ -212,37 +214,37 @@ int main(int argc, char* argv[]) {
                 Add this gene�s TF to the running total TF
 
     */ // TODO: parallelize the computations for each gene for exp 1 and exp 2.
-    #pragma omp parallel for num_threads(thread_count) default(none) shared(genes, gene_TF_counts)
-    for (int gene_index = 0; gene_index < genes.num_genes; ++gene_index) {
+    #pragma omp parallel num_threads(thread_count) default(none) shared(genes, gene_TF_counts, median_TF)
+    {
+        #pragma omp for
+        for (int gene_index = 0; gene_index < genes.num_genes; ++gene_index) {
 
-        // Compute this gene's TF
-        int* gene_TF = (int*)calloc(NUM_TETRANUCS, sizeof(int));
-        process_tetranucs(genes, gene_TF, gene_index);
+            // Compute this gene's TF
+            int* gene_TF = (int*)calloc(NUM_TETRANUCS, sizeof(int));
+            process_tetranucs(genes, gene_TF, gene_index);
 
-        // Save to 2d array
-        gene_TF_counts[gene_index] = gene_TF;
-    }
-
-
-    // 2) Find the medians (as a double!)
-    // TODO: parallelize the computations for each median for exp 2 only
-    double* median_TF = (double*)calloc(NUM_TETRANUCS, sizeof(double));
-    for (int tet = 0; tet < NUM_TETRANUCS; ++tet) {
-        int num_genes = genes.num_genes;
-        
-        // save all frequencies of TF here
-        printf("\nUnsorted Frequencies: ");
-        int* freqs = (int*)calloc(num_genes, sizeof(int));
-        for (int gene = 0; gene < num_genes; ++gene){
-            freqs[gene] = gene_TF_counts[gene][tet];
-            printf("%d ", freqs[gene]);
+            // Save to 2d array
+            gene_TF_counts[gene_index] = gene_TF;
         }
-        printf("  ");
-        // find median frequency
-        median_TF[tet] = find_median(freqs, num_genes);
-        free(freqs);
-    }
 
+
+        // 2) Find the medians (as a double!)
+        // TODO: parallelize the computations for each median for exp 2 only
+        #pragma omp for
+        for (int tet = 0; tet < NUM_TETRANUCS; ++tet) {
+            int num_genes = genes.num_genes;
+            
+            // save all frequencies of TF here
+            int* freqs = (int*)calloc(num_genes, sizeof(int));
+            for (int gene = 0; gene < num_genes; ++gene){
+                freqs[gene] = gene_TF_counts[gene][tet];
+            }
+
+            // find median frequency
+            median_TF[tet] = find_median(freqs, num_genes);
+            free(freqs);
+        }
+    }
 
     // Get the passed time
     double end = omp_get_wtime();

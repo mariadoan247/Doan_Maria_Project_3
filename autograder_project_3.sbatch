@@ -27,7 +27,7 @@ module purge
 module load SciPy-bundle/2020.03-foss-2020a-Python-3.8.2
 
 # To run all the problems and get all results
-# python3 -u autograder_project_3.py
+python3 -u autograder_project_3.py
 
 # To run just problem 2's autograder
 # python3 -u autograder_problem_3_2.py
@@ -41,7 +41,7 @@ module load SciPy-bundle/2020.03-foss-2020a-Python-3.8.2
 # ./compute_average_TF_Exp2_schedule /home/oucspdn086/test_data/DNA_Files/GRCh38_latest_rna.fna /home/oucspdn086/Doan_Maria_Project_3/Problem_2/res_schedule_latest_8th.csv /home/oucspdn086/Doan_Maria_Project_3/Problem_2/tim_schedule_latest_8th.csv 8
 
 # To run just problem 3's autograder
-python3 -u autograder_problem_3_3.py
+# python3 -u autograder_problem_3_3.py
 
 # To run just problem 4's autograder
 # python3 -u autograder_problem_3_4.py
